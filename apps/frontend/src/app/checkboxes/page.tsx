@@ -1,13 +1,9 @@
 'use client';
 import { useEffect, useState } from 'react';
 import Checkbox from './Checkbox';
-import styles from './page.module.css';
 import io from 'socket.io-client';
-
-type CheckboxObject = {
-  id: number;
-  isChecked: boolean;
-};
+import styles from './page.module.css';
+import type { CheckboxObject } from '@frog-monorepo/shared-types';
 
 const socket = io('http://localhost:3001');
 
@@ -16,16 +12,16 @@ const changeCheckbox = (checkboxId: number) => {
 };
 
 export default function Index() {
-  const [checkboxes, setCheckboxes] = useState<CheckboxObject[] | []>([]);
+  const [checkboxes, setCheckboxes] = useState<CheckboxObject[]>([]);
 
   useEffect(() => {
     socket.emit('connected');
-    socket.on('sync_checkboxes', (data) => {
-      setCheckboxes(data);
+    socket.on('sync_checkboxes', (syncedCheckboxes: CheckboxObject[]) => {
+      setCheckboxes(syncedCheckboxes);
     });
 
-    socket.on('checkbox_clicked', (temp) => {
-      setCheckboxes(temp);
+    socket.on('checkbox_clicked', (syncedCheckboxes: CheckboxObject[]) => {
+      setCheckboxes(syncedCheckboxes);
     });
   }, []);
 
